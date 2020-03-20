@@ -1,5 +1,7 @@
 ---
 title: "Hoja de trabajo 4"
+author: "Gustavo de León - 17085 | Andrés Urízar - 17632"
+date: "19/03/2020"
 output: html_document
 ---
 
@@ -13,8 +15,9 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r echo=FALSE}
+  #setwd("C:/Users/Gustavo/Desktop/SEPTIMO SEMESTRE/MINERIA/HDT4/laboratorio_05")
+  setwd("C:/Users/alber/Documents/UVG/Septimo semestre/Mineria de Datos/Hoja-Trabajo_4/laboratorio_05")
 ```
 
 ## Including Plots
