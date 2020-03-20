@@ -107,15 +107,19 @@ lillie.test(fitMLM_Price$residuals)
 ```
 
 ```{r}
-#predMLM<-predict(fitMLM_Price,newdata = test[,c("poner los numeros de las columnas menos de saleprice")])
-#RMSE(predMLM,test1$SalePrice)
+predMLM<-predict(fitMLM_Price,newdata = test1[,c(1,3,4)])
+library(caret)
 ```
 
 ```{r}
-#plot(test$Petal.Length,col="blue")
-#points(predMLM, col="red")
+RMSE(predMLM,test1$SalePrice)
 ```
 
 ```{r}
-#summary(test1$SalePrice-predMLM)
+plot(test1$SalePrice,col="blue")
+points(predMLM, col="red")
+```
+
+```{r}
+summary(test1$SalePrice-predMLM)
 ```
