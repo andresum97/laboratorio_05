@@ -17,6 +17,7 @@ Predecir los precios de las casa con un modelo lineal
 ```
 #### Conjuntos de entrenamiento y prueba.  
 Se escogieron ciertas variables para hacer la particion. Todas variables cuantitativas.
+Sin embargo se haran pruebas con variables diferentes por eso se definen trainP 1,2 y 3 para mas adelante.
 
 ```{r}
   datos <- read.csv("train.csv", stringsAsFactors = FALSE)
@@ -27,16 +28,23 @@ Se escogieron ciertas variables para hacer la particion. Todas variables cuantit
   train[is.na(train)]<-0
 ```
 Se hizo una partición aleatoria utilizando el 70% de los datos para entrenamiento y el 30% de los datos para prueba.  
+
 ```{r}
   porcentaje<-0.7
-  set.seed(123)
+  set.seed(200)
   corte <- sample(nrow(train),nrow(train)*porcentaje)
   train1<-train[corte,]
   test1<-train[-corte,]
 ```
+
+Conjunto de Prueba (cantidad de muestras: `r nrow(test1)`):  
+```{r}
+head(test1)
+```
 ### Estimación del precio de las casas con todas las demas variables escogidas.
 
 Se realizara el modelo lineal de todas las variables escogidas con el precio.
+
 ```{r}
 fitMLM_Price<-lm(SalePrice~.,data = train)
 ```
@@ -44,11 +52,15 @@ El resumen del modelo:
 ```{r}
 summary(fitMLM_Price)
 ```
+4 variables predictoras de las 5 son significativas, y el modelo tiene un R ajustado de 0.60. 
+El cual no es perfecto pero realiza su trabajo.
+
 ```{r}
 plot(train)
 ```
 
 Como se puede apreciar las variables escogidas presentan un problema de multicolinealidad especialmente la variable de GarageCars y YearRemodAdd
+
 ```{r}
 # install.packages("corrplot")
 library(corrplot)
@@ -56,7 +68,9 @@ matriz_cor <- cor(train)
 matriz_cor
 corrplot(matriz_cor)
 ```
+
 Probemos utilizar los datos de TrainP1 quitando la variable de GarageCar
+
 ```{r}
 # install.packages("corrplot")
 library(corrplot)
@@ -64,7 +78,9 @@ matriz_cor <- cor(trainP1)
 matriz_cor
 corrplot(matriz_cor)
 ```
+
 Probemos utilizar los datos de TrainP2 quitando la variable de YearRemodAdd
+
 ```{r}
 # install.packages("corrplot")
 library(corrplot)
@@ -72,7 +88,9 @@ matriz_cor <- cor(trainP2)
 matriz_cor
 corrplot(matriz_cor)
 ```
+
 Probemos utilizar los datos de TrainP3 quitando las 2 variables GarageCar y YearRemodAdd
+
 ```{r}
 # install.packages("corrplot")
 library(corrplot)
@@ -80,7 +98,9 @@ matriz_cor <- cor(trainP3)
 matriz_cor
 corrplot(matriz_cor)
 ```
+
 ### Nuevo modelo
+
 Ahora realicemos el modelo lineal con los datos de trainP3 
 ```{r}
 fitMLM_Price<-lm(SalePrice~.,data = trainP3)
@@ -89,18 +109,28 @@ Resumen del modelo
 ```{r}
 summary(fitMLM_Price)
 ```
+
+El R ajustado bajo asi que revisemos los residuos
+
 ```{r}
 plot(fitMLM_Price)
 ```
+
+Los graficos se ven que los residuos si estan distriubidos aleatoriamente alrededor de 0 como en la grafica de Residuals vs Fitted. Aunque en el grafico q-q se nota que existen varios datos extremos que desbalancean los datos. Esto se vera mejor en un histograma.
 
 ```{r}
 hist(fitMLM_Price$residuals)
 ```
 
+Se ve que los datos no son normales, una razon por la cual afecta al modelo.
+
 ```{r}
 boxplot(fitMLM_Price$residuals)
 ```
 
+Igual en el diagrama de caja y bigotes se nota todas las variables que desbalancean el modelo.
+
+La prueba de lilliefors da que se rechaza la hipotesis de normalidad para un valor de significación de 0.05. Asi que lo mas probable es que no prediga bien.
 ```{r}
 library(nortest)
 lillie.test(fitMLM_Price$residuals)
@@ -119,6 +149,9 @@ RMSE(predMLM,test1$SalePrice)
 plot(test1$SalePrice,col="blue")
 points(predMLM, col="red")
 ```
+
+Debido a la gran cantidad de puntos no se puede comparar 1 por 1 pero podemos notar que la gran maypria de puntos azules si estan como que acomparañados de un punto rojo, o sea las predicciones si tienen lógica con el dato real sin embargo en los puntos atipicos si no se acercaron.
+
 
 ```{r}
 summary(test1$SalePrice-predMLM)
