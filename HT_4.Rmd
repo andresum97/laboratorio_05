@@ -8,31 +8,114 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+### Objetivo
+Predecir los precios de las casa con un modelo lineal
 ```{r echo=FALSE}
-# Ubicacion de archivos en computadoras
-  #setwd("C:/Users/Gustavo/Desktop/SEPTIMO SEMESTRE/MINERIA/HDT4/laboratorio_05")
-  setwd("C:/Users/alber/Documents/UVG/Septimo semestre/Mineria de Datos/Hoja-Trabajo_4/laboratorio_05")
+  #Ubicacion de archivos en computadoras
+  setwd("C:/Users/Gustavo/Desktop/SEPTIMO SEMESTRE/MINERIA/HDT4/laboratorio_05")
+  #setwd("C:/Users/alber/Documents/UVG/Septimo semestre/Mineria de Datos/Hoja-Trabajo_4/laboratorio_05")
 ```
+#### Conjuntos de entrenamiento y prueba.  
+Se escogieron ciertas variables para hacer la particion. Todas variables cuantitativas.
+
 ```{r}
-  test <- read.csv("test.csv", stringsAsFactors = FALSE)
-  train <- read.csv("train.csv", stringsAsFactors = FALSE)
-  trainImportantes <- train[c("LotArea","OverallCond","YearBuilt","YearRemodAdd","FullBath","TotRmsAbvGrd","KitchenAbvGr","GarageCars")]
-  trainImportantes[is.na(trainImportantes)]<-0
+  datos <- read.csv("train.csv", stringsAsFactors = FALSE)
+  train <- datos[c("YearBuilt","YearRemodAdd","FullBath","TotRmsAbvGrd","GarageCars","SalePrice")]
+  trainP1 <- datos[c("YearBuilt","YearRemodAdd","FullBath","TotRmsAbvGrd","SalePrice")]
+  trainP2 <- datos[c("YearBuilt","FullBath","TotRmsAbvGrd","GarageCars","SalePrice")]
+  trainP3 <- datos[c("YearBuilt","FullBath","TotRmsAbvGrd","SalePrice")]
+  train[is.na(train)]<-0
 ```
+Se hizo una partición aleatoria utilizando el 70% de los datos para entrenamiento y el 30% de los datos para prueba.  
 ```{r}
   porcentaje<-0.7
   set.seed(123)
-  corte <- sample(nrow(trainImportantes),nrow(trainImportantes)*porcentaje)
-  train<-trainImportantes[corte,]
-  test<-trainImportantes[-corte,]
+  corte <- sample(nrow(train),nrow(train)*porcentaje)
+  train1<-train[corte,]
+  test1<-train[-corte,]
+```
+### Estimación del precio de las casas con todas las demas variables escogidas.
+
+Se realizara el modelo lineal de todas las variables escogidas con el precio.
+```{r}
+fitMLM_Price<-lm(SalePrice~.,data = train)
+```
+El resumen del modelo:
+```{r}
+summary(fitMLM_Price)
 ```
 ```{r}
-fitLMPW<-lm(SalePrice~., data = train)
-summary(fitLMPW)
+plot(train)
+```
+
+Como se puede apreciar las variables escogidas presentan un problema de multicolinealidad especialmente la variable de GarageCars y YearRemodAdd
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+matriz_cor <- cor(train)
+matriz_cor
+corrplot(matriz_cor)
+```
+Probemos utilizar los datos de TrainP1 quitando la variable de GarageCar
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+matriz_cor <- cor(trainP1)
+matriz_cor
+corrplot(matriz_cor)
+```
+Probemos utilizar los datos de TrainP2 quitando la variable de YearRemodAdd
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+matriz_cor <- cor(trainP2)
+matriz_cor
+corrplot(matriz_cor)
+```
+Probemos utilizar los datos de TrainP3 quitando las 2 variables GarageCar y YearRemodAdd
+```{r}
+# install.packages("corrplot")
+library(corrplot)
+matriz_cor <- cor(trainP3)
+matriz_cor
+corrplot(matriz_cor)
+```
+### Nuevo modelo
+Ahora realicemos el modelo lineal con los datos de trainP3 
+```{r}
+fitMLM_Price<-lm(SalePrice~.,data = trainP3)
+```
+Resumen del modelo
+```{r}
+summary(fitMLM_Price)
 ```
 ```{r}
-predL<-predict(fitLMPW, newdata = test)
-head(predL)
-length(predL)
+plot(fitMLM_Price)
+```
+
+```{r}
+hist(fitMLM_Price$residuals)
+```
+
+```{r}
+boxplot(fitMLM_Price$residuals)
+```
+
+```{r}
+library(nortest)
+lillie.test(fitMLM_Price$residuals)
+```
+
+```{r}
+#predMLM<-predict(fitMLM_Price,newdata = test[,c("poner los numeros de las columnas menos de saleprice")])
+#RMSE(predMLM,test1$SalePrice)
+```
+
+```{r}
+#plot(test$Petal.Length,col="blue")
+#points(predMLM, col="red")
+```
+
+```{r}
+#summary(test1$SalePrice-predMLM)
 ```
