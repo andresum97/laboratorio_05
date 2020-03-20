@@ -9,38 +9,30 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
 ```{r echo=FALSE}
-  setwd("C:/Users/Gustavo/Desktop/SEPTIMO SEMESTRE/MINERIA/HDT4/laboratorio_05")
-  #setwd("C:/Users/alber/Documents/UVG/Septimo semestre/Mineria de Datos/Hoja-Trabajo_4/laboratorio_05")
+# Ubicacion de archivos en computadoras
+  #setwd("C:/Users/Gustavo/Desktop/SEPTIMO SEMESTRE/MINERIA/HDT4/laboratorio_05")
+  setwd("C:/Users/alber/Documents/UVG/Septimo semestre/Mineria de Datos/Hoja-Trabajo_4/laboratorio_05")
 ```
 ```{r}
   test <- read.csv("test.csv", stringsAsFactors = FALSE)
   train <- read.csv("train.csv", stringsAsFactors = FALSE)
-  trainImportantes <- train[c("MSSubClass","LotFrontage","LotArea","OverallCond","YearBuilt","YearRemodAdd","X2ndFlrSF","FullBath","TotRmsAbvGrd","KitchenAbvGr","GarageCars","PoolArea","SalePrice")]
+  trainImportantes <- train[c("LotArea","OverallCond","YearBuilt","YearRemodAdd","FullBath","TotRmsAbvGrd","KitchenAbvGr","GarageCars")]
   trainImportantes[is.na(trainImportantes)]<-0
 ```
 ```{r}
   porcentaje<-0.7
   set.seed(123)
-
-  trainImportantes$y<- as.numeric(trainImportantes$SalePrice)
   corte <- sample(nrow(trainImportantes),nrow(trainImportantes)*porcentaje)
   train<-trainImportantes[corte,]
   test<-trainImportantes[-corte,]
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+fitLMPW<-lm(SalePrice~., data = train)
+summary(fitLMPW)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+predL<-predict(fitLMPW, newdata = test)
+head(predL)
+length(predL)
+```
